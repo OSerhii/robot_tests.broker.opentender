@@ -21,7 +21,7 @@ def convert_string_from_dict_opentender(string):
         u"True": u"1",
         u"False": u"0",
         u"Відкриті торги": u"aboveThresholdUA",
-        u'Код ДК 021-2015 (CPV)': u'CPV',
+        u'Класифікація предмета закупівлі згідно ДК': u'CPV',
         u'Код ДК': u'ДКПП',
         u'з урахуванням ПДВ': True,
         u'без урахуванням ПДВ': False,

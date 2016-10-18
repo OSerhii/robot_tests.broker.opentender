@@ -36,10 +36,12 @@ Login
   [Arguments]  ${username}  ${tender_data} 
   ${items}=  Get From Dictionary  ${tender_data.data}  items
   Switch Browser  ${username}
-  Reload Page
-  Wait Until Page Contains Element  xpath=//a[@href="/buyer/tenders"]  10
+  Click Element  xpath=//button[@data-dismiss="modal"]
+  Wait Until Element Is Not Visible  xpath=//div[@class="modal-backdrop fade"]  10
   Click Element  xpath=//a[@href="http://prozorroc.byustudio.in.ua/tenders"]
+  Click Element  xpath=//a[@href="http://prozorroc.byustudio.in.ua/tenders/index"]
   Click Element  xpath=//a[contains(@href,"/buyer/tender/create")]
+  Execute Javascript  $('#navbar-main').remove()
   Conv And Select From List By Value  name=Tender[value][valueAddedTaxIncluded]  ${tender_data.data.value.valueAddedTaxIncluded}
   ConvToStr And Input Text  name=Tender[value][amount]  ${tender_data.data.value.amount}
   ConvToStr And Input Text  name=Tender[minimalStep][amount]  ${tender_data.data.minimalStep.amount}
@@ -50,8 +52,8 @@ Login
   Input Date  name=Tender[tenderPeriod][startDate]  ${tender_data.data.tenderPeriod.startDate}   
   Input Date  name=Tender[tenderPeriod][endDate]  ${tender_data.data.tenderPeriod.endDate}   
   Додати предмет  ${items[0]}  0
-  Click Element  xpath= //button[@class="btn btn-default btn_submit_form"]
-  Wait Until Page Contains Element  xpath=//span[@tid="tenderID"]  10
+  Click Element  xpath=//button[contains(@class,'btn_submit_form')]
+  Wait Until Element Is Visible  xpath=//span[@tid="tenderID"]  10
   ${tender_uaid}=  Get Text  xpath=//span[@tid="tenderID"]
   [return]  ${tender_uaid}
 
@@ -73,12 +75,13 @@ Login
   Wait Until Page Contains  ${item.additionalClassifications[0].description}
   Click Element  xpath=//div[@id="${item.additionalClassifications[0].id}"]/div/span[contains(text(), '${item.additionalClassifications[0].description}')]
   Click Element  id=btn-ok
-  Wait Until Element Is Not Visible  xpath=//div[@class="modal-backdrop fade"]
+  Wait Until Element Is Visible  name=Tender[items][${index}][deliveryAddress][countryName]
   Input text  name=Tender[items][${index}][deliveryAddress][countryName]  ${item.deliveryAddress.countryName}
   Input text  name=Tender[items][${index}][deliveryAddress][region]  ${item.deliveryAddress.region}
   Input text  name=Tender[items][${index}][deliveryAddress][locality]  ${item.deliveryAddress.locality}
   Input text  name=Tender[items][${index}][deliveryAddress][streetAddress]  ${item.deliveryAddress.streetAddress}
   Input text  name=Tender[items][${index}][deliveryAddress][postalCode]  ${item.deliveryAddress.postalCode}
+  Input Date  name=Tender[items][${index}][deliveryDate][startDate]  ${item.deliveryDate.endDate}
   Input Date  name=Tender[items][${index}][deliveryDate][endDate]  ${item.deliveryDate.endDate}
   Select From List By Value  name=Tender[procuringEntity][contactPoint][fio]  24
 
@@ -86,24 +89,27 @@ Login
   [Arguments]  ${username}  ${filepath}  ${tender_uaid}
   Switch Browser  ${username}
   Go to  ${USERS.users['${username}'].homepage}
-  Click Element  xpath=//button[@tid="tender_dropdown"]
-  Click Element  xpath=//a[@href="/buyer/tenders"]
+  Click Element  xpath=(//button[@data-toggle="dropdown"])[2]
+  Click Element  xpath=//a[@href="/buyer/tenders/index"]
   Click Element  xpath=//span[text()='${tender_uaid}']/ancestor::div[@class="thumbnail"]/descendant::a
   Click Element  xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript  $('#navbar-main').remove()
   Choose File  name=FileUpload[file]  ${filepath}
-  Click Button  xpath=//button[@class="btn btn-default btn_submit_form"]
+  Click Button  xpath=//button[contains(@class,'btn_submit_form')]
 
 Пошук тендера по ідентифікатору
   [Arguments]  ${username}  ${tender_uaid}
   Switch browser  ${username}
   Go To  http://prozorroc.byustudio.in.ua/tenders/
+  Execute Javascript  $('#navbar-main').remove()
   Input text  name=TendersSearch[tender_cbd_id]  ${tender_uaid}
-  Click Element  xpath=//button[@tid="search"]
+  Click Element  xpath=//button[text()='Шукати']
   Wait Until Keyword Succeeds  30x  400ms  Перейти на сторінку з інформацією про тендер  ${tender_uaid}
+  Execute Javascript  $('#navbar-main').remove()
 
 Перейти на сторінку з інформацією про тендер
   [Arguments]  ${tender_uaid}
-  Wait Until Element Contains  xpath=//div[@class="summary"]/b[2]  1
+  Wait Until Element Is Not Visible  xpath=//ul[@class="pagination"]
   Click Element  xpath=//span[text()='${tender_uaid}']/ancestor::div[@class="thumbnail"]/descendant::a
   Wait Until Element Is Visible  xpath=//span[@tid="tenderID"]
 
@@ -115,8 +121,9 @@ Login
   [Arguments]  ${username}  ${tenderID}  ${field_name}  ${field_value}
   opentender.Пошук тендера по ідентифікатору  ${username}  ${tenderID}
   Click Element  xpath=//a[contains(text(),'Редагувати')]
+  Execute Javascript  $('#navbar-main').remove()
   Input text  name=Tender[${field_name}]  ${field_value}
-  Click Element  xpath=//button[@class="btn btn-default btn_submit_form"]
+  Click Element  xpath=//button[contains(@class,'btn_submit_form')]
   Wait Until Page Contains  ${field_value}  30
 
 ###############################################################################################################
@@ -200,7 +207,7 @@ Login
 Змінити документ в ставці
   [Arguments]  ${username}  ${path}  ${bidid}  ${docid}
   Wait Until Keyword Succeeds   30 x   10 s   Дочекатися вивантаження файлу до ЦБД
-  Execute Javascript  window.confirm = function(msg) { return true; }
+  Execute Javascript  window.confirm = function(msg) { return true; }; $('#navbar-main').remove()
   Choose File  xpath=//div[contains(text(), 'Замiнити')]/form/input  ${path}
   Click Element  xpath=//button[contains(text(), 'Вiдправити')]
   Wait Until Element Is Visible  xpath=//div[contains(@class, 'alert-success')]
