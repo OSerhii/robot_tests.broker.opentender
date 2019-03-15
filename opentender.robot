@@ -53,6 +53,7 @@ ${host}  http://test-eauction.open-tender.com.ua
     Wait Until Element Is Visible  xpath=//nav[@id="toggleRight"]/descendant::a[contains(@href, "/assets/index")]
     Click Element  xpath=//nav[@id="toggleRight"]/descendant::a[contains(@href, "/assets/index")]
     Click Element  xpath=//a[contains(@href, "/buyer/asset/create")]
+    Wait Until Element Is Visible  id=asset-title
     Input Text  id=asset-title  ${tender_data.data.title}
     Input Text  id=asset-description  ${tender_data.data.description}
     Input Text  id=decision-0-title  ${decisions[0].title}
